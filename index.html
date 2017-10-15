@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+        integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+        crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+        integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+        crossorigin=""></script>
+        <style>
+            #mapid { height: 800px; }
+        </style>
+    </head>
+    <body>
+        <h1>
+            <center>
+                Atelier NodeJS
+            </center>
+        </h1>
+        <div id="mapid"></div>
+
+        <label>Query<input type="text" id="searchQuery" value="paris" /></label><br />
+        <label>Lat,long<input type="text" id="latLon" value="48.8669576,2.3116284,5km" /></label>
+        <button type="button" name="refresh" onclick="refreshMap()">Refresh</button>
+
+        <script>
+             var map = L.map('mapid').setView([48.8669576,2.3116284], 13);
+
+             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+             }).addTo(map);
+
+            function getTweets(callback)
+            {
+                var searchQuery = document.getElementById('searchQuery')
+                var latlon = document.getElementById('latLon')
+
+                var xmlHttp = new XMLHttpRequest();
+                xmlHttp.onreadystatechange = function() {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                        callback(JSON.parse(xmlHttp.responseText));
+                }
+                xmlHttp.open("GET", `/tweets?q=${searchQuery.value}&latlon-${latlon.value}`, true);
+                xmlHttp.send(null);
+
+                var latlonArray = latlon.value.split(',')
+                map.setView([latlonArray[0], latlonArray[1]], 13)
+            }
+
+            function refreshMap() {
+                getTweets(tweets => {
+                    tweets.forEach(function(tweet){
+                        if (tweet !== null && tweet.geo !== null) {
+
+                            var tweetImage = L.icon({
+                                iconUrl: 'https://abs.twimg.com/favicons/favicon.ico',
+                                iconSize: [40, 40],
+                            })
+
+                            L.marker(tweet.geo.coordinates, {
+                                title: tweet.text,
+                                icon: tweetImage
+                            }).bindPopup(function (layer) {
+                                return `<p style="text-align:center"><img style="width:100px" src="${tweet.user.profile_image_url}" /><br />@${tweet.user.name}</p><p>${tweet.text}</p>`;
+                            }).addTo(map)
+                        }
+                    })
+                })
+            }
+
+            refreshMap()
+         </script>
+    </body>
+</html>

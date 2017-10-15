@@ -1,0 +1,23 @@
+{
+  "name": "atelier-node",
+  "version": "1.0.0",
+  "description": "SilexLabs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FTwex/atelier-node.git"
+  },
+  "author": "Florian Toueix",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FTwex/atelier-node/issues"
+  },
+  "homepage": "https://github.com/FTwex/atelier-node#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "twitter": "^1.7.1"
+  }
+}
